@@ -15,7 +15,7 @@ import { CopyToClipboardText } from '../../../components/CopyToClipboardText';
 
 export const ContactsTable = ({ data }) => {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} data-testid="contacts-table-container">
       <Table sx={{ minWidth: 650 }} aria-label="contacts table">
         <TableHead>
           <TableRow>

@@ -8,7 +8,7 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 export const CopyToClipboardText = ({ text }) => {
   const [, copyToClipboard] = useCopyToClipboard();
-  const [copyStatus, setCopyStatus] = useState('Copy');
+  const [copyStatus, setCopyStatus] = useState('Copy ');
 
   const onClickCopy = useCallback(() => {
     copyToClipboard(text);

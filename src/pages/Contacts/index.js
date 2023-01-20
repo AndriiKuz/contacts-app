@@ -15,11 +15,11 @@ export const Contacts = () => {
 
   const render = () => {
     if (contacts.isLoading) {
-      return <CircularProgress />;
+      return <CircularProgress data-testid="contacts-loader" />;
     }
 
     if (contacts.isError) {
-      return <div>Error</div>;
+      return <div data-testid="contacts-error">Error</div>;
     }
 
     if (viewMode === DATA_VIEW_MODES.TABLE) {
@@ -27,7 +27,7 @@ export const Contacts = () => {
     }
 
     if (viewMode === DATA_VIEW_MODES.GRID) {
-      return 'grid';
+      return <div data-testid="contacts-grid-container">grid</div>;
     }
     return null;
   };
