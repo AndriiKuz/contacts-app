@@ -22,7 +22,7 @@ export const CopyToClipboardText = ({ text }) => {
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <Tooltip title={copyStatus} placement="top" arrow>
-        <Button sx={{ color: 'black' }} onClick={onClickCopy}>
+        <Button sx={{ p: 0 }} onClick={onClickCopy}>
           <FileCopyOutlinedIcon
             variant="outline"
             sx={{ marginRight: 1, fontSize: 'small' }}

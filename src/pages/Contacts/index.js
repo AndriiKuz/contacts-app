@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useContacts } from './useContacts';
+import { useState, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
@@ -9,27 +8,25 @@ import { DATA_VIEW_MODES } from './constants/constants';
 import { ContactsTable } from './ContactsTable';
 import { ToggleDataViewMode } from './ToggleDataViewMode';
 import { ContactsFilters } from './ContactsFilters';
+import { ContactsPagination } from './ContactsPagination';
+import { ContactsGrid } from './ContactsGrid';
+import { Message } from './Message';
 import { useViewMode } from './useViewMode';
-
-const filtersDefaultValue = {
-  fullname: '',
-  gender: 'all',
-  nationality: 'all',
-};
-
-const filterByFullname = ({ first, last }, fullname) =>
-  first?.toLowerCase().includes(fullname.toLowerCase()) ||
-  last?.toLowerCase().includes(fullname.toLowerCase());
-
-const filterByGender = (value, gender) =>
-  gender === 'all' ? true : value === gender;
-
-const filterByNationality = (value, nationality) =>
-  nationality === 'all' ? true : value === nationality;
+import { useContacts } from './useContacts';
+import { useFilters } from './useFilters';
+import { usePagination } from './usePagination';
 
 export const Contacts = () => {
-  const contacts = useContacts();
   const [viewMode, setViewMode] = useViewMode();
+  const contacts = useContacts();
+
+  const {
+    filtersDefaultValue,
+    filterByFullname,
+    filterByGender,
+    filterByNationality,
+  } = useFilters();
+
   const [filters, setFilters] = useState(filtersDefaultValue);
 
   const filteredContacts = contacts.data
@@ -37,35 +34,22 @@ export const Contacts = () => {
     .filter((contact) => filterByGender(contact.gender, filters.gender))
     .filter((contact) => filterByNationality(contact.nat, filters.nationality));
 
-  const updateFilter = (name, value) => {
+  const updateFilter = useCallback((name, value) => {
     setFilters((filters) => ({
       ...filters,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const clearFilters = () => {
-    setFilters(filtersDefaultValue);
-  };
+  const clearFilters = useCallback(
+    () => {
+      setFilters(filtersDefaultValue);
+    }, // eslint-disable-next-line
+    []
+  );
 
-  const render = () => {
-    if (contacts.isLoading) {
-      return <CircularProgress data-testid="contacts-loader" />;
-    }
-
-    if (contacts.isError) {
-      return <div data-testid="contacts-error">Error</div>;
-    }
-
-    if (viewMode === DATA_VIEW_MODES.TABLE) {
-      return <ContactsTable data={filteredContacts} />;
-    }
-
-    if (viewMode === DATA_VIEW_MODES.GRID) {
-      return <div data-testid="contacts-grid-container">grid</div>;
-    }
-    return null;
-  };
+  const { quantityPages, currentContacts, currentPage, setCurrentPage } =
+    usePagination(filteredContacts);
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -81,14 +65,46 @@ export const Contacts = () => {
 
         <Grid item sx={{ mb: 2 }} xs={12}>
           <ContactsFilters
-            filters={filters}
             updateFilter={updateFilter}
             clearFilters={clearFilters}
+            filters={filters}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
           />
         </Grid>
-        <Grid item xs={12}>
-          {render()}
+
+        <Grid item xs={12} sx={{ mb: 2 }}>
+          {contacts.isLoading ? (
+            <Box display="flex" justifyContent="center" sx={{ mb: 5, mt: 5 }}>
+              <CircularProgress data-testid="contacts-loader" />
+            </Box>
+          ) : contacts.isError ? (
+            <Box data-testid="contacts-error">
+              <Message
+                severity="error"
+                text={'ERROR! Something went wrong...'}
+              />
+            </Box>
+          ) : !currentContacts.length ? (
+            <Box>
+              <Message severity="info" text={'Contacts not found.'} />
+            </Box>
+          ) : viewMode === DATA_VIEW_MODES.TABLE ? (
+            <ContactsTable data={currentContacts} />
+          ) : viewMode === DATA_VIEW_MODES.GRID ? (
+            <div data-testid="contacts-grid-container">
+              <ContactsGrid data={currentContacts} />
+            </div>
+          ) : null}
         </Grid>
+
+        {currentContacts.length && !contacts.isError && !contacts.isLoading ? (
+          <ContactsPagination
+            quantityPages={quantityPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+        ) : null}
       </Grid>
     </Container>
   );

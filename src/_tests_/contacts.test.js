@@ -8,6 +8,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Contacts } from '../pages/Contacts';
+// import { users } from '../_fixtures_/users';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());

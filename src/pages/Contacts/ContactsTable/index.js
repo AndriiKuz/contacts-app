@@ -31,6 +31,7 @@ export const ContactsTable = ({ data }) => {
         <TableBody>
           {data.map((contact) => (
             <TableRow
+              dsta-testid="contacts-table-row"
               key={contact.login.uuid}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
@@ -40,7 +41,7 @@ export const ContactsTable = ({ data }) => {
                   alt={`${contact.name.first} ${contact.name.last}`}
                 />
               </TableCell>
-              <TableCell>
+              <TableCell data-testid="contacts-table-cell-fullname">
                 {contact.name.title} {contact.name.first} {contact.name.last}
               </TableCell>
               <TableCell>
